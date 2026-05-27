@@ -315,7 +315,7 @@ sequenceDiagram
 
 ## 8. Authentication and Authorization Flow
 
-Authentication is owned by auth-service. Roles and permissions are owned by user-service. Tenant lifecycle and status are owned by tenant-service.
+Authentication uses Keycloak as the preferred IAM provider, or an equivalent OIDC/OAuth2 service if the final deployment requires a different provider. The auth-service owns the platform authentication facade and IAM integration boundary. Roles and permissions are owned by user-service unless a specific permission is intentionally delegated to the IAM provider. Tenant lifecycle and status are owned by tenant-service.
 
 ```mermaid
 sequenceDiagram

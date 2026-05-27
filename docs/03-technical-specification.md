@@ -30,6 +30,7 @@ The platform shall provide configurable SACCO operations across multiple tenants
 | Forms and Validation | React Hook Form, Zod |
 | Backend Services | Spring Boot microservices |
 | API Edge | API Gateway |
+| Identity and access management | Keycloak preferred, or equivalent OIDC/OAuth2 IAM provider |
 | Authentication | JWT-based authentication with refresh tokens and MFA support |
 | Database | PostgreSQL |
 | Messaging | Kafka where asynchronous event-driven behavior is required |
@@ -239,7 +240,7 @@ The initial platform shall include the following core services:
 | Service | Primary Responsibility |
 | --- | --- |
 | gateway-service | API routing, edge policies, request controls, external API entry point |
-| auth-service | Authentication, token issuance, MFA, credential lifecycle |
+| auth-service | Platform authentication facade, Keycloak/OIDC integration, token/session coordination, MFA orchestration |
 | tenant-service | Tenant lifecycle, tenant metadata, subscription state, tenant isolation configuration |
 | user-service | Users, staff accounts, roles, permissions, access profiles |
 | member-service | Member onboarding, KYC, member profiles, lifecycle events |
@@ -374,7 +375,9 @@ API contracts shall define:
 
 ### 7.1 Authentication Model
 
-The platform shall use JWT-based authentication with short-lived access tokens and controlled refresh token rotation. The auth-service shall be responsible for:
+The platform shall use Keycloak as the preferred identity and access management provider, or an equivalent standards-compliant OIDC/OAuth2 IAM service if the final infrastructure decision changes. Authentication shall use short-lived JWT access tokens with controlled refresh token rotation.
+
+The auth-service shall act as the platform authentication facade and IAM integration boundary. It must not become a place for unrelated domain authorization or member business logic. It shall be responsible for:
 
 - Login
 - Logout
@@ -385,6 +388,9 @@ The platform shall use JWT-based authentication with short-lived access tokens a
 - Session tracking
 - Credential lockout policies
 - Device/session revocation
+- Keycloak/OIDC realm, client, claim, and token validation integration
+
+Keycloak or the selected IAM provider shall own core identity-provider responsibilities such as credential verification, OIDC/OAuth2 flows, token signing keys, realm/client configuration, identity federation where required, and standard IAM security policies. Platform services shall consume validated identity, tenant, role, permission, and session context through the gateway and auth-service boundary.
 
 ### 7.2 Identity Types
 
@@ -429,6 +435,8 @@ Step-up authentication may be required for actions that exceed configured risk t
 ### 7.5 Service-to-Service Authentication
 
 Internal services shall authenticate with service credentials or workload identity patterns. Service-to-service calls must not rely solely on network location. Internal APIs shall validate service identity and authorization scopes.
+
+Where Keycloak is used, service accounts or client credentials may be used for approved internal service integrations. Internal service authentication must still preserve tenant context, correlation IDs, and audit context for tenant-owned or sensitive workflows.
 
 ## 8. Multi-Tenancy Architecture
 

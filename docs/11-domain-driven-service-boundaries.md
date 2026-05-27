@@ -4,7 +4,7 @@
 
 This document defines the domain-driven service boundaries for the SACCO platform. It is intended to guide future backend implementation, API design, event design, database ownership, operational workflows, and financial transaction controls.
 
-The platform is a multi-tenant, API-first SACCO system built with Spring Boot microservices, PostgreSQL, Kafka where asynchronous messaging is required, JWT authentication, and an API gateway. It must support web, mobile app, USSD, and PWA channels for more than 1 million members.
+The platform is a multi-tenant, API-first SACCO system built with Spring Boot microservices, PostgreSQL, Kafka where asynchronous messaging is required, Keycloak or an equivalent OIDC/OAuth2 IAM provider, JWT authentication, and an API gateway. It must support web, mobile app, USSD, and PWA channels for more than 1 million members.
 
 This document does not generate implementation code. It defines ownership, source-of-truth rules, inter-service communication patterns, domain events, saga patterns, idempotency, tenant isolation, audit propagation, and failure handling.
 
@@ -32,7 +32,8 @@ Examples:
 | Business Fact | Source of Truth |
 | --- | --- |
 | Tenant status and domains | tenant-service |
-| User credentials and sessions | auth-service |
+| User credentials and IAM identity state | Keycloak or selected OIDC/OAuth2 IAM provider, integrated through auth-service |
+| Platform session metadata and auth integration state | auth-service |
 | User roles and permissions | user-service |
 | Member profile and KYC status | member-service |
 | Savings product and savings account state | savings-service |
@@ -444,7 +445,7 @@ All transaction-critical failures must be visible through operational dashboards
 #### Does Not Own
 
 - Domain business rules
-- User credentials
+- IAM account references and credential lifecycle coordination
 - Role definitions
 - Financial transactions
 - Tenant product configuration
@@ -533,7 +534,7 @@ The gateway is stateless and horizontally scalable. It is transaction-critical f
 
 #### Consistency and Scalability
 
-Authentication requires strong consistency for credential and session state. It is horizontally scalable with shared secure session/token storage. It is transaction-critical.
+Authentication requires strong consistency for IAM integration, session state, token lifecycle coordination, and login attempt tracking. Credential verification and token signing are owned by Keycloak or the selected IAM provider. The auth-service is horizontally scalable with shared secure session/token metadata storage where required. It is transaction-critical.
 
 ### 12.3 tenant-service
 
@@ -633,7 +634,7 @@ Tenant identity and status require strong consistency. Tenant reads are high-vol
 #### Dependencies
 
 - tenant-service for tenant status validation.
-- auth-service for credential lifecycle coordination.
+- auth-service for IAM credential lifecycle coordination through Keycloak or the selected IAM provider.
 - audit-service through audit event publication.
 
 #### Consistency and Scalability
@@ -658,7 +659,7 @@ Authorization data requires strong consistency inside user-service. Read access 
 - Savings account balances
 - Loan account balances
 - Wallet balances
-- User login credentials
+- IAM account references and login identity mapping
 - External payment state
 - Accounting ledger entries
 
@@ -1037,7 +1038,7 @@ Payment-service is transaction-critical. Provider callbacks must be durably capt
 
 - Business decision to send a notification
 - Financial transaction state
-- Authentication credentials
+- Authentication credential references and IAM integration metadata
 - Tenant lifecycle
 
 #### Exposes APIs
@@ -1336,7 +1337,8 @@ Allowed synchronous dependencies should be shallow and business-justified:
 
 - member-service owns member registration and lifecycle.
 - user-service owns user access if a member login account is created.
-- auth-service owns credentials and sessions.
+- Keycloak or the selected IAM provider owns core credential verification, OIDC/OAuth2 clients, token signing keys, and IAM policy configuration.
+- auth-service owns platform authentication integration, session metadata, auth events, and token/session coordination exposed to the rest of the platform.
 
 #### Synchronous Steps
 

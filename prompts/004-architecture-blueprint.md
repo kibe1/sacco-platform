@@ -12,6 +12,7 @@ Target stack:
 - Kafka/Event-driven communication
 - API Gateway
 - Redis caching
+- Keycloak or equivalent OIDC/OAuth2 IAM integration
 - JWT authentication
 
 Generate a complete architecture blueprint for the platform.

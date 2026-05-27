@@ -7,6 +7,7 @@ Target stack:
 - Next.js frontend
 - PostgreSQL
 - API Gateway
+- Keycloak or equivalent OIDC/OAuth2 IAM integration
 - JWT Authentication
 - Event-driven architecture where necessary
 

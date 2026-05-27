@@ -32,6 +32,7 @@ The platform must support:
 ## Backend
 - Spring Boot microservices
 - API Gateway
+- Keycloak or equivalent OIDC/OAuth2 identity and access management
 - JWT Authentication
 - Kafka/Event-driven communication where necessary
 

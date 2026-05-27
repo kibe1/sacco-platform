@@ -3,7 +3,12 @@ node_modules/
 dist/
 target/
 .env
+.env.local
+.env.*.local
 *.log
 coverage/
 .idea/
 .vscode/
+.DS_Store
+out/
+build/

@@ -1,0 +1,19 @@
+{
+  "name": "sacco-platform",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:member": "npm run dev --workspace=@sacco/member-portal",
+    "dev:admin": "npm run dev --workspace=@sacco/admin-portal",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  }
+}

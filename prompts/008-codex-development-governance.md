@@ -25,7 +25,7 @@ The document must define:
 7. API generation rules
 8. Microservice boundary enforcement
 9. Tenant isolation enforcement
-10. Security enforcement
+10. Security enforcement, including Keycloak or equivalent OIDC/OAuth2 IAM boundaries
 11. Financial transaction rules
 12. Idempotency requirements
 13. Outbox/inbox requirements

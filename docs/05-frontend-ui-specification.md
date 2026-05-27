@@ -555,11 +555,13 @@ Zustand shall be used for client UI state only. It must not become a shadow back
 
 ## 19. Authentication UI Flows
 
+Authentication UI must integrate with the platform auth-service, which in turn integrates with Keycloak or an equivalent OIDC/OAuth2 IAM provider. Frontend apps should not hard-code Keycloak realm/client details outside approved environment configuration or auth SDK setup.
+
 ### 19.1 Login Flow
 
 1. Resolve tenant context from host or selected tenant.
 2. Display tenant-aware login branding.
-3. Submit credentials to auth flow through gateway.
+3. Start the approved auth flow through gateway/auth-service and the selected IAM provider.
 4. If MFA is required, move to MFA challenge screen.
 5. On success, load user access profile and tenant configuration.
 6. Route user to role-appropriate dashboard.

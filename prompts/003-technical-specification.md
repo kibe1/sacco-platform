@@ -32,7 +32,7 @@ The specification should include:
 3. Frontend architecture
 4. Backend microservices architecture
 5. API gateway strategy
-6. Authentication & authorization strategy
+6. Authentication & authorization strategy, including Keycloak or equivalent OIDC/OAuth2 IAM integration
 7. Multi-tenancy architecture
 8. Database architecture
 9. Messaging/event-driven architecture

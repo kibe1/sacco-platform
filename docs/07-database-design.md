@@ -115,7 +115,8 @@ Services must not:
 | Business Fact | Database Owner |
 | --- | --- |
 | Tenant identity, status, routing metadata | tenant-service |
-| Credentials, sessions, MFA state | auth-service |
+| IAM credentials and identity-provider state | Keycloak or selected OIDC/OAuth2 IAM provider, integrated through auth-service |
+| Platform session metadata, login attempts, auth audit coordination | auth-service |
 | Users, roles, permissions, branch scopes | user-service |
 | Member profile, KYC, lifecycle | member-service |
 | Savings products, savings accounts, contributions, withdrawals | savings-service |
@@ -456,23 +457,24 @@ Key considerations:
 
 Recommended table groups:
 
-- Credentials
-- Password history where required by policy
-- Refresh tokens
+- IAM user/account mapping references
+- Session metadata
+- Refresh token references where stored by the platform rather than the IAM provider
 - Sessions
-- MFA challenges
+- MFA challenge references where orchestrated by the platform
 - Login attempts
 - Device records
-- Service account credentials
+- Service account/client references
 
 Source of truth:
 
-- auth-service owns credentials, sessions, token lifecycle, MFA, and authentication attempts.
+- Keycloak or the selected OIDC/OAuth2 IAM provider owns credential verification, token signing keys, OIDC clients, core IAM configuration, and identity-provider state.
+- auth-service owns platform authentication metadata, session references, login attempts, auth audit coordination, and integration state required by the platform.
 
 Security considerations:
 
-- Store only password hashes, never raw passwords.
-- Store refresh tokens securely and support rotation/revocation.
+- Prefer storing credentials in the selected IAM provider rather than duplicating password stores in platform databases.
+- If platform-side token references are stored, store them securely and support rotation/revocation.
 - OTP/MFA data must be short-lived and protected.
 - Login attempts should support rate limiting and fraud monitoring.
 
