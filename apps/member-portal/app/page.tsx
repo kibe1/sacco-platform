@@ -1,3 +1,5 @@
+import { createKeycloakLoginUrl } from "./lib/keycloak";
+
 const summaryItems = [
   { label: "Savings Balance", value: "KES 0.00" },
   { label: "Loan Balance", value: "KES 0.00" },
@@ -5,6 +7,8 @@ const summaryItems = [
 ];
 
 export default function MemberHomePage() {
+  const loginUrl = createKeycloakLoginUrl();
+
   return (
     <main className="shell">
       <section className="header">
@@ -12,7 +16,9 @@ export default function MemberHomePage() {
           <p className="eyebrow">Member Portal</p>
           <h1>SACCO self-service</h1>
         </div>
-        <button type="button">Sign in</button>
+        <a className="button" href={loginUrl}>
+          Sign in
+        </a>
       </section>
 
       <section className="grid" aria-label="Account summary">

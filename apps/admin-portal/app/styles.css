@@ -47,6 +47,19 @@ a {
   padding: 10px 0;
 }
 
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  margin-top: 16px;
+  border-radius: 6px;
+  background: #18201f;
+  color: #ffffff;
+  padding: 0 16px;
+  font-weight: 700;
+}
+
 .content {
   padding: 32px;
 }
