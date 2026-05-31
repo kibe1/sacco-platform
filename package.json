@@ -9,6 +9,7 @@
   "scripts": {
     "dev:member": "npm run dev --workspace=@sacco/member-portal",
     "dev:admin": "npm run dev --workspace=@sacco/admin-portal",
+    "dev:mobile": "npm run dev --workspace=@sacco/mobile-app",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },

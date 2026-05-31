@@ -8,6 +8,7 @@ Modern multi-tenant SACCO platform for admin/staff operations, member self-servi
 apps/
   admin-portal/
   member-portal/
+  mobile-app/
 packages/
   api-contracts/
   shared-types/
@@ -18,6 +19,7 @@ services/
   tenant-service/
   user-service/
   member-service/
+  ussd-service/
 infrastructure/
   docker/
   kubernetes/
@@ -35,6 +37,7 @@ prompts/
 - Tenant-service foundation
 - User/RBAC foundation
 - Member-service foundation
+- USSD channel adapter foundation
 - Admin and member portal shells
 
 ## Local Platform Services
