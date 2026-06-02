@@ -1,0 +1,112 @@
+{
+  "realm": "sacco-platform",
+  "enabled": true,
+  "displayName": "SACCO Platform",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "rememberMe": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrative portal operator"
+      },
+      {
+        "name": "member",
+        "description": "Member self-service portal user"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "admin-portal",
+      "name": "SACCO Admin Portal",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:3100/auth/callback",
+        "http://localhost:3100/auth/login"
+      ],
+      "webOrigins": [
+        "http://localhost:3100"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:3100/auth/login"
+      }
+    },
+    {
+      "clientId": "member-portal",
+      "name": "SACCO Member Portal",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:3101/auth/callback",
+        "http://localhost:3101/auth/login"
+      ],
+      "webOrigins": [
+        "http://localhost:3101"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:3101/auth/login"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin.user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin.user@sacco.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Admin@12345",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin"
+      ],
+      "attributes": {
+        "tenant_id": [
+          "local-sacco"
+        ]
+      }
+    },
+    {
+      "username": "member.user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Member",
+      "lastName": "User",
+      "email": "member.user@sacco.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Member@12345",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "member"
+      ],
+      "attributes": {
+        "tenant_id": [
+          "local-sacco"
+        ]
+      }
+    }
+  ]
+}

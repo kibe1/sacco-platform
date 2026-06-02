@@ -3,16 +3,22 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev --port 3100",
+    "dev": "next dev --hostname 0.0.0.0 --port 3100",
     "build": "next build",
     "start": "next start --port 3100",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "@svgr/webpack": "^8.1.0",
+    "@tailwindcss/postcss": "^4.3.0",
+    "apexcharts": "^4.7.0",
+    "next": "^16.2.6",
+    "react": "^19.2.6",
+    "react-apexcharts": "^1.9.0",
+    "react-dom": "^19.2.6",
+    "tailwind-merge": "^2.6.1",
+    "tailwindcss": "^4.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

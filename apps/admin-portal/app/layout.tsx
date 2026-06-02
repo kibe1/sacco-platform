@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import type { ReactNode } from "react";
 import "./styles.css";
+import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "SACCO Admin Portal",
@@ -14,7 +14,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("sacco-admin-theme")||((window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light");document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t;}catch(e){}`
+          }}
+        />
+      </head>
+      <body suppressHydrationWarning>
+        {children}
+      </body>
     </html>
   );
 }

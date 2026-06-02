@@ -4,6 +4,15 @@ server:
 spring:
   application:
     name: gateway-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/sacco_platform}
+    username: ${SPRING_DATASOURCE_USERNAME:sacco}
+    password: ${SPRING_DATASOURCE_PASSWORD:sacco_dev_password}
+    driver-class-name: org.postgresql.Driver
+
+sacco:
+  services:
+    auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8081}
 
 management:
   endpoints:

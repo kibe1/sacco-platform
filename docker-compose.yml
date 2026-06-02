@@ -51,16 +51,123 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:25.0
     container_name: sacco-keycloak
-    command: start-dev
+    command: start-dev --import-realm
     environment:
       KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN:-admin}
       KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
     ports:
       - "${KEYCLOAK_PORT:-8180}:8080"
+    volumes:
+      - ./infrastructure/keycloak/import:/opt/keycloak/data/import:ro
     depends_on:
       postgres:
         condition: service_healthy
 
+  auth-service:
+    image: maven:3.9.9-eclipse-temurin-21
+    container_name: sacco-auth-service
+    working_dir: /workspace
+    command: mvn -pl services/auth-service spring-boot:run
+    environment:
+      SERVER_PORT: 8081
+      KEYCLOAK_ISSUER_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-sacco-platform}
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-sacco-platform}/protocol/openid-connect/certs
+    ports:
+      - "${AUTH_SERVICE_PORT:-18081}:8081"
+    volumes:
+      - .:/workspace
+      - maven-repo:/root/.m2
+    depends_on:
+      keycloak:
+        condition: service_started
+
+  gateway-service:
+    image: maven:3.9.9-eclipse-temurin-21
+    container_name: sacco-gateway-service
+    working_dir: /workspace
+    command: mvn -pl services/gateway-service spring-boot:run
+    environment:
+      SERVER_PORT: 8088
+      AUTH_SERVICE_URL: http://auth-service:8081
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-sacco_platform}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-sacco}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-sacco_dev_password}
+    ports:
+      - "${GATEWAY_SERVICE_PORT:-8088}:8088"
+    volumes:
+      - .:/workspace
+      - maven-repo:/root/.m2
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+
+  frontend-deps:
+    image: node:22-alpine
+    container_name: sacco-frontend-deps
+    working_dir: /workspace
+    command: npm install
+    volumes:
+      - .:/workspace
+      - node-modules:/workspace/node_modules
+
+  admin-portal:
+    image: node:22-alpine
+    container_name: sacco-admin-portal
+    working_dir: /workspace
+    command: npm run dev:admin
+    environment:
+      API_URL: http://gateway-service:8088
+      API_GATEWAY_URL: http://gateway-service:8088
+      NEXT_PUBLIC_APP_BASE_URL: http://localhost:${ADMIN_PORTAL_PORT:-3100}
+      NEXT_PUBLIC_KEYCLOAK_BASE_URL: http://localhost:${KEYCLOAK_PORT:-8180}
+      KEYCLOAK_INTERNAL_BASE_URL: http://keycloak:8080
+      NEXT_PUBLIC_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-sacco-platform}
+      NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: admin-portal
+      SACCO_TENANT_ID: ${SACCO_TENANT_ID:-local-sacco}
+    ports:
+      - "${ADMIN_PORTAL_PORT:-3100}:3100"
+    volumes:
+      - .:/workspace
+      - node-modules:/workspace/node_modules
+      - admin-next-cache:/workspace/apps/admin-portal/.next
+    depends_on:
+      frontend-deps:
+        condition: service_completed_successfully
+      gateway-service:
+        condition: service_started
+
+  member-portal:
+    image: node:22-alpine
+    container_name: sacco-member-portal
+    working_dir: /workspace
+    command: npm run dev:member
+    environment:
+      API_URL: http://gateway-service:8088
+      API_GATEWAY_URL: http://gateway-service:8088
+      NEXT_PUBLIC_APP_BASE_URL: http://localhost:${MEMBER_PORTAL_PORT:-3101}
+      NEXT_PUBLIC_KEYCLOAK_BASE_URL: http://localhost:${KEYCLOAK_PORT:-8180}
+      KEYCLOAK_INTERNAL_BASE_URL: http://keycloak:8080
+      NEXT_PUBLIC_KEYCLOAK_REALM: ${KEYCLOAK_REALM:-sacco-platform}
+      NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: member-portal
+      SACCO_TENANT_ID: ${SACCO_TENANT_ID:-local-sacco}
+    ports:
+      - "${MEMBER_PORTAL_PORT:-3101}:3101"
+    volumes:
+      - .:/workspace
+      - node-modules:/workspace/node_modules
+      - member-next-cache:/workspace/apps/member-portal/.next
+    depends_on:
+      frontend-deps:
+        condition: service_completed_successfully
+      gateway-service:
+        condition: service_started
+
 volumes:
   postgres-data:
   kafka-data:
+  maven-repo:
+  node-modules:
+  admin-next-cache:
+  member-next-cache:
