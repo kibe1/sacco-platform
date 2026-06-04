@@ -8,6 +8,65 @@ type TokenResponse = {
   expires_in?: number;
 };
 
+type JwtClaims = {
+  realm_access?: {
+    roles?: string[];
+  };
+};
+
+const cookieNames = [
+  "sacco_member_access_token",
+  "sacco_member_refresh_token",
+  "sacco_member_id_token",
+  "sacco_member_oauth_state",
+  "sacco_member_return_to"
+];
+
+function decodeJwtPayload(token: string): JwtClaims | null {
+  try {
+    const payload = token.split(".")[1];
+    if (!payload) {
+      return null;
+    }
+
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(Buffer.from(normalized, "base64").toString("utf8")) as JwtClaims;
+  } catch {
+    return null;
+  }
+}
+
+function hasMemberAccess(accessToken: string) {
+  const roles = decodeJwtPayload(accessToken)?.realm_access?.roles ?? [];
+  return roles.includes("member");
+}
+
+function clearAuthCookies(response: NextResponse) {
+  for (const name of cookieNames) {
+    response.cookies.set(name, "", {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+      path: "/",
+      maxAge: 0
+    });
+  }
+}
+
+function createKeycloakLogoutUrl(idToken?: string) {
+  const params = new URLSearchParams({
+    post_logout_redirect_uri: `${appBaseUrl}/auth/login`
+  });
+
+  if (idToken) {
+    params.set("id_token_hint", idToken);
+  } else {
+    params.set("client_id", clientId);
+  }
+
+  return `${process.env.NEXT_PUBLIC_KEYCLOAK_BASE_URL ?? "http://localhost:8180"}/realms/${process.env.NEXT_PUBLIC_KEYCLOAK_REALM ?? "sacco-platform"}/protocol/openid-connect/logout?${params.toString()}`;
+}
+
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   const state = request.nextUrl.searchParams.get("state");
@@ -42,6 +101,13 @@ export async function GET(request: NextRequest) {
   }
 
   const tokens = (await tokenResponse.json()) as TokenResponse;
+
+  if (!hasMemberAccess(tokens.access_token)) {
+    const response = NextResponse.redirect(createKeycloakLogoutUrl(tokens.id_token));
+    clearAuthCookies(response);
+    return response;
+  }
+
   const response = NextResponse.redirect(new URL(returnTo, appBaseUrl));
 
   response.cookies.set("sacco_member_access_token", tokens.access_token, {

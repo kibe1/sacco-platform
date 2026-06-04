@@ -1167,6 +1167,10 @@ nav {
   color: var(--muted);
 }
 
+.snapshot-grid > div > span::after {
+  content: ": ";
+}
+
 .queue-item b {
   grid-row: span 2;
   align-self: center;
@@ -1224,6 +1228,11 @@ nav {
   grid-template-columns: 64px 1fr minmax(160px, auto);
   gap: 12px;
   padding: 12px;
+}
+
+.activity-row > div {
+  display: grid;
+  gap: 4px;
 }
 
 .activity-row time {
@@ -1996,6 +2005,11 @@ body {
 .tail-card-heading p {
   color: var(--tail-muted);
   margin-bottom: 14px;
+}
+
+.tail-stat-bottom p::after,
+.tail-target-footer > div > span::after {
+  content: ": ";
 }
 
 .tail-stat-bottom strong {

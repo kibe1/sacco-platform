@@ -32,8 +32,8 @@ export function ThemeToggle() {
   }
 
   return (
-    <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label="Toggle color theme">
-      <span aria-hidden="true">{theme === "dark" ? "Light" : "Dark"}</span>
+    <button className="theme-toggle tailadmin-circle-action" type="button" onClick={toggleTheme} aria-label="Toggle color theme">
+      <span aria-hidden="true">{theme === "dark" ? "☀" : "☾"}</span>
     </button>
   );
 }
